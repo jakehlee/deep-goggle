@@ -27,6 +27,9 @@ opts.filterGroup = NaN ; % Helps select one or the other group of filters.
 opts.neigh = +inf ; % To select a small neighborhood of neurons. 
 opts.optim_method = 'gradient-descent'; % Only 'gradient-descent' is currently used
 
+opts.featOverride = 0; % Whether to use external feature vectors instead
+opts.featImported = 0; % The external feature to use
+
 opts.imgSize = [];
 
 % Parse the input arguments to override the above defaults

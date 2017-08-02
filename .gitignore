@@ -1,0 +1,6 @@
+ihog
+matconvnet
+vlfeat
+experiments/data/results*
+experiments/data/imageset
+experiments/networks/imagenet-caffe-ref.mat

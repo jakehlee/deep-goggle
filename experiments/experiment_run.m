@@ -1,15 +1,23 @@
 function experiment_run(exp)
 
-if matlabpool('size') > 0
+p = gcp('nocreate');
+
+if isempty(p)
+    poolsize = 0;
+else
+    poolsize = p.NumWorkers;
+end
+
+if poolsize > 0
   parfor i=1:numel(exp) % Easily run lots of experiments on a cluster
     run_one(exp{i}) ;
   end
 else
   for i=1:numel(exp)
     ts = tic;
-    fprintf(1, 'Starting an expeirment');
+    fprintf(1, 'Starting an experiment');
     run_one(exp{i}) ;
-    fprintf(1, 'done an expeirment');
+    fprintf(1, 'done an experiment');
     toc(ts);
   end
 end
@@ -38,6 +46,7 @@ end
 switch exp.model
   case 'caffe-ref'
     net = load('networks/imagenet-caffe-ref.mat') ;
+    net = vl_simplenn_tidy(net);
     exp.opts.normalize = get_cnn_normalize(net.meta.normalization) ;
     exp.opts.denormalize = get_cnn_denormalize(net.meta.normalization) ;
     exp.opts.imgSize = net.meta.normalization.imageSize;
@@ -67,11 +76,18 @@ switch exp.model
     exp.opts.denormalize = @(x) cat(3,x,x,x) + 128 ;
     exp.opts.imgSize = [size(im, 1), size(im, 2), 1];
 end
-net = vl.simplenn_tidy(net);
+net = vl_simplenn_tidy(net);
 if isinf(exp.layer), exp.layer = numel(net.layers) ; end
 net.layers = net.layers(1:exp.layer) ;
 
-feats = compute_features(net, im, exp.opts);
+feats = 0;
+if exp.opts.featOverride
+    disp('Using imported feature')
+    feats = exp.opts.featImported;
+else
+    feats = compute_features(net, im, exp.opts);
+end
+
 input = im;
 
 % run experiment
