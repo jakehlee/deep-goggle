@@ -34,13 +34,15 @@ if exist(fullfile(expPath, [expName '.mat'])), return ; end
 
 fprintf('running experiment %s\n', exp.name) ;
 
-% read image
-im = imread(exp.path) ;
-if size(im,3) == 1, im = cat(3,im,im,im) ; end
+% read image if not override
+if ~exp.opts.featOverride
+    im = imread(exp.path) ;
+    if size(im,3) == 1, im = cat(3,im,im,im) ; end
 
-if exp.useHoggle
-  run_one_hoggle(exp, expPath, expName, im) ;
-  return ;
+    if exp.useHoggle
+      run_one_hoggle(exp, expPath, expName, im) ;
+      return ;
+    end
 end
 
 switch exp.model
@@ -66,7 +68,7 @@ switch exp.model
     exp.opts.denormalize = @(x) cat(3,x,x,x) + 128 ;
     exp.opts.imgSize = [size(im, 1), size(im, 2), 1];
   case 'hog'
-    net = hog_net(8) 
+    net = hog_net(8) ;
     exp.opts.normalize = @(x) 255 * rgb2gray(im2single(x)) - 128  ;
     exp.opts.denormalize = @(x) cat(3,x,x,x) + 128 ;
     exp.opts.imgSize = [size(im,1), size(im,2), 1];
