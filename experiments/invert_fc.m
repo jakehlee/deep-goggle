@@ -9,50 +9,41 @@ opts.learningRate = 0.004 * [...
   0.01 * ones(1,100)];
 opts.objective = 'l2' ;
 opts.beta = 6 ;
-opts.lambdaTV = 1e2 ;
+opts.lambdaTV = 5e1 ;
 opts.lambdaL2 = 8e-10 ;
+opts.TVbeta = 2;
+opts.numRepeats = 1;
+opts.featOverride = 1;
 
-opts1 = opts;
-opts1.lambdaTV = 1e0 ;
-opts1.TVbeta = 2;
+recon_csv = '/home/jakelee/demud_results/recon-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
+resid_csv = '/home/jakelee/demud_results/resid-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
+select_csv = '/home/jakelee/demud_results/select-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
 
-opts2 = opts ;
-opts2.lambdaTV = 1e1 ;
-opts2.TVbeta = 2;
+top_n = 2;
 
-opts3 = opts ;
-opts3.lambdaTV = 1e2 ;
-opts3.TVbeta = 2;
-
-% without external override; 
-opts4 = opts;
-opts4.lambdaTV = 1e2;
-opts4.TVbeta = 2;
-opts4.numRepeats = 1;
-
-% with external override
-opts5 = opts;
-opts5.lambdaTV = 5e1;
-opts5.TVbeta = 2;
-opts5.numRepeats = 1;
-%
-opts5.featOverride = 1;
-opts5.featImported =feat_import('/home/jakelee/caffe_6_27_17/fc6.csv', ...
-    1, 99);
-
-% If using external, make sure this matches!
+rng(24);
+%16 fc6, 18 fc7, 20 fc8
 layer = 16;
-image = 'data/imageset/0/0-0.jpg';
-ver = 'results_7_31_beta2_lambda5e1_1_ext';
+ver = 'results_8_10_demud_1';
 
-exp = {};
-exp{1} = experiment_init('caffe-ref', 16, image, ver, 'cnn', opts5);
-%exp{2} = experiment_init('caffe-ref', 17, image, ver, 'cnn', opts5);
-%exp{3} = experiment_init('caffe-ref', 18, image, ver, 'cnn', opts5);
-%exp{4} = experiment_init('caffe-ref', 19, image, ver, 'cnn', opts5);
-%exp{5} = experiment_init('caffe-ref', 20, image, ver, 'cnn', opts5);
+exp_counter = 1;
+exp_list = {} ;
+for i=1:top_n
+    
+    opts1 = opts;
+    opts1.featImported = feat_import(select_csv, 0, i);
+    exp_list{exp_counter} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+        '-select'), ver, 'cnn', opts1);
+    opts1.featImported = feat_import(recon_csv, 0, i);
+    exp_list{exp_counter+1} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+        '-recon'), ver, 'cnn', opts1);
+    opts1.featImported = feat_import(resid_csv, 0, i);
+    exp_list{exp_counter+2} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+        '-resid'), ver, 'cnn', opts1);
+    exp_counter = exp_counter+3;
+end
 
-experiment_run(exp);
+experiment_run(exp_list);
 end
 
 

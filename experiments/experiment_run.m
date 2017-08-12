@@ -90,7 +90,7 @@ else
     feats = compute_features(net, im, exp.opts);
 end
 
-input = im;
+%input = im;
 
 % run experiment
 args = expandOpts(exp.opts) ;
@@ -115,7 +115,7 @@ else
 end
 vl_printsize(1) ;
 print('-dpdf',  fullfile(expPath, [expName '-opt.pdf'])) ;
-imwrite(input / 255, fullfile(expPath, [expName '-orig.png'])) ;
+%imwrite(input / 255, fullfile(expPath, [expName '-orig.png'])) ;
 imwrite(im, fullfile(expPath, [expName '-recon.png'])) ;
 
 % save videos
