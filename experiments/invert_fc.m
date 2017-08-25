@@ -15,30 +15,31 @@ opts.TVbeta = 2;
 opts.numRepeats = 1;
 opts.featOverride = 1;
 
-recon_csv = '/home/jakelee/demud_results/recon-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
-resid_csv = '/home/jakelee/demud_results/resid-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
-select_csv = '/home/jakelee/demud_results/select-cnn-k=500-dim=4096-full-init_item=svd.csv' ;
+recon_csv = '/recon/file.csv' ;
+resid_csv = '/resid/file.csv' ;
+select_csv = '/select/file.csv' ;
 
-top_n = 2;
+top_n = 8;
 
+%seed to keep consistent
 rng(24);
 %16 fc6, 18 fc7, 20 fc8
 layer = 16;
-ver = 'results_8_10_demud_1';
+ver = 'output_dir_name';
 
 exp_counter = 1;
 exp_list = {} ;
 for i=1:top_n
-    
+    i
     opts1 = opts;
     opts1.featImported = feat_import(select_csv, 0, i);
-    exp_list{exp_counter} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+    exp_list{exp_counter} = experiment_init('caffe-ref', layer, strcat(int2str(i-1), ...
         '-select'), ver, 'cnn', opts1);
     opts1.featImported = feat_import(recon_csv, 0, i);
-    exp_list{exp_counter+1} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+    exp_list{exp_counter+1} = experiment_init('caffe-ref', layer, strcat(int2str(i-1), ...
         '-recon'), ver, 'cnn', opts1);
     opts1.featImported = feat_import(resid_csv, 0, i);
-    exp_list{exp_counter+2} = experiment_init('caffe-ref', layer, strcat(int2str(i), ...
+    exp_list{exp_counter+2} = experiment_init('caffe-ref', layer, strcat(int2str(i-1), ...
         '-resid'), ver, 'cnn', opts1);
     exp_counter = exp_counter+3;
 end

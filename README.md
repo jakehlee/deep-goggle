@@ -67,3 +67,17 @@ Setting up and running your own networks
 3. Run the network forward to generate a target reference representation y0
 4. Call res = invert\_nn(net, y0, \[options\]);
 5. res.output\{end\} is the required reconstruction.
+
+
+DEMUD result inversion
+----------------------
+
+The inversion script for DEMUD results is `invert_fc()`. It expects the three DEMUD output CSVs for CNN feature vectors (reconstruction, residual, and selections) and inverts the top `top_n` selections.
+
+Note that, in order to enable parallelization, you should run `parpool` in the MATLAB console first.
+
+Ensure that the `layer` var corresponds to the layer from which the vectors were extracted - the more common values are commented.
+
+Results are stored in /deep-goggle-jl/experiments/data/`ver`. Deep-goggle will skip an inversion if a file already exists at the location.
+
+Note: `invert_fc()` evolved from a script that originally inverted a single feature vector. I realize now that this is probably still useful, and will include it later.
