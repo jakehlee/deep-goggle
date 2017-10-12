@@ -52,7 +52,14 @@ load('x0_sigma.mat', 'x0_sigma');
 y0 = repmat(ref, [1 1 1 opts.numRepeats]);
 
 % initial inversion image of size x0_size
+% x0_size = (227, 227, 3, 1), RGB!
 x = randn(x0_size, 'single') ;
+
+% --- Override random initialization examples ---
+% x = zeros(x0_size, 'single') ;
+% x(:,:,3) = 1;
+% x = ones(x0_size, 'single');
+
 x = x / norm(x(:)) * x0_sigma  ; 
 x_momentum = zeros(x0_size, 'single') ;
 
